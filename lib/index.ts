@@ -21,7 +21,11 @@ class DlcOracle {
         return hexString;
     }
 
-
+    /**
+     * Calculates the euclidean modulo over two BN bignums
+     * @param num1 The dividend
+     * @param num2 The divisor
+     */
     private static euclideanMod(num1 : any, num2 : any) : any {
         // TODO: Typings
         let num20 = new BN(num2);
@@ -41,8 +45,10 @@ class DlcOracle {
     }
 
     /**
-     * 
-     * @param value 
+     * Generates a proper byte array (Buffer) for a given numeric value
+     * This because numeric values are expected to be wrapped in a 32 byte
+     * message by LIT
+     * @param value Number to encode
      */
     static generateNumericMessage(value : number) : Buffer {
         let numberString = value.toString(16)
@@ -51,14 +57,33 @@ class DlcOracle {
         return Buffer.from(numberString, 'hex')
     }
 
+    /**
+     * Derives the public key to a private key
+     * @param privateKey The private key to derive the public key for
+     */
     static publicKeyFromPrivateKey(privateKey : Buffer) : Buffer {
         let keyPair = ec.keyFromPrivate(privateKey);
         return Buffer.from(keyPair.getPublic(true,'hex'),'hex');
     } 
 
+    /**
+     * Will return a new random private scalar to be used when signing a new message
+     */
     static generateOneTimeSigningKey() : Buffer {
         return randomBytes(32);
     }
+
+    /**
+     * calculates the signature multipled by the generator
+     * point, for an arbitrary message based on pubkey R and pubkey A.
+     * Calculates P = pubR - h(msg, pubR)pubA.
+     * This is used when building settlement transactions and determining the pubkey
+     * to the oracle's possible signatures beforehand. Can be calculated with just
+     * public keys, so by anyone.
+     * @param oracleA The oracle's public key
+     * @param oracleR The oracle's R-point (public key to the one-time signing key)
+     * @param message The message to compute the signature pubkey for
+     */
     static computeSignaturePubKey(oracleA : Buffer, oracleR : Buffer, message : Buffer) : Buffer {
         let A = ec.keyFromPublic(oracleA);
         let R = ec.keyFromPublic(oracleR);
@@ -82,6 +107,14 @@ class DlcOracle {
 
         return Buffer.from(P.encodeCompressed('hex'),'hex');
     }
+
+    /**
+     * Computes the signature for an arbitrary message based on two private scalars:
+     * The one-time signing key and the oracle's private key
+     * @param privateKey The private key to sign with
+     * @param oneTimeSigningKey The one-time signing key to sign with
+     * @param message The message to sign
+     */
     static computeSignature(privateKey : Buffer, oneTimeSigningKey : Buffer, message : Buffer) : Buffer {
         let bigPriv = new BN(privateKey.toString('hex'),16);
         let bigK = new BN(oneTimeSigningKey.toString('hex'),16);
