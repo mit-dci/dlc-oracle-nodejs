@@ -1,7 +1,7 @@
 {
   "name": "dlc-oracle-nodejs",
-  "version": "0.0.1",
-  "description": "",
+  "version": "0.0.3",
+  "description": "This library allows you to easily build oracles for use in Discreet Log Contracts using NodeJS",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
