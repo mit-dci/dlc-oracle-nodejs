@@ -182,11 +182,11 @@ function signValueAndPrint() {
 Next, run your code again. It will print out something like this (you'll have to wait 60 seconds for the value to be published, unless you decreased the `setTimeout` parameter).
 
 ```
-Oracle public key: 032382208af6ab43b8d21e71edf73ec8f37070a9b4fc4547f406bcd744b4e8e7b3
-R-Point for next publication: 02f650ab605757ef687ffa1ab0e493ed8e8c054adf6ff010605656ed3a992e6ef4
-Signed message. Value: 18081
-Signature: 8b044f80589821a8a6d1837752dfdda5809236b7ce72e63e789ae9288c2937dc
-R-Point for next publication: 03126cdf6340bd1277abe2f2bef6ab21c594e44398876113efebb2e6a855ec0ae1
+Oracle Public Key:  03c0d496ef6656fe102a689abc162ceeae166832d826f8750c94d797c92eedd465
+R-Point for next publication:  03a0f180839d927aba40f924c369692af4f54ab0611299176dbd46658e452fa750
+Value published:  18620
+Signature:  7b0238448615cdef48e9d24b61ca776125b84a7fc56edac070b854bdd013a9b9
+R-Point for next publication:  03b379049fbba926c4700dfbc43c1452ccfdb4eb4d98cb2ca625f5ed7c59db53b5
 ```
 
 ### Done!
