@@ -1,11 +1,11 @@
-import { randomBytes, createHash } from 'crypto'
+import { createHash } from 'crypto'
+const csprng = require("sodium").Random;
 const BN = require('bn.js');
 const EC = require('elliptic').ec;
 
 // Create and initialize EC context
 // (better do it once and reuse it)
 const ec = new EC('secp256k1');
- 
 
 class DlcOracle {
 
@@ -32,7 +32,7 @@ class DlcOracle {
         let neg = false;
         if(num1.isNeg()) {
             neg = true;
-        } 
+        }
         num1 = num1.mod(num2);
         if(neg) {
             if(num2.isNeg()) {
@@ -64,13 +64,13 @@ class DlcOracle {
     static publicKeyFromPrivateKey(privateKey : Buffer) : Buffer {
         let keyPair = ec.keyFromPrivate(privateKey);
         return Buffer.from(keyPair.getPublic(true,'hex'),'hex');
-    } 
+    }
 
     /**
      * Will return a new random private scalar to be used when signing a new message
      */
     static generateOneTimeSigningKey() : Buffer {
-        return randomBytes(32);
+        return csprng.randombytes_buf(32);
     }
 
     /**
@@ -87,7 +87,7 @@ class DlcOracle {
     static computeSignaturePubKey(oracleA : Buffer, oracleR : Buffer, message : Buffer) : Buffer {
         let A = ec.keyFromPublic(oracleA);
         let R = ec.keyFromPublic(oracleR);
-        
+
         let Rx = R.pub.getX();
         let RxString = DlcOracle.padHexString(Rx.toString(16));
 
@@ -118,7 +118,7 @@ class DlcOracle {
     static computeSignature(privateKey : Buffer, oneTimeSigningKey : Buffer, message : Buffer) : Buffer {
         let bigPriv = new BN(privateKey.toString('hex'),16);
         let bigK = new BN(oneTimeSigningKey.toString('hex'),16);
-        
+
         let R = ec.g.mul(bigK);
         let Rx = R.getX();
         let RxString = DlcOracle.padHexString(Rx.toString(16));
@@ -127,9 +127,9 @@ class DlcOracle {
         e.update(message);
         e.update(Buffer.from(RxString,'hex'))
         let eHex = e.digest('hex');
-        
+
         let bigE = new BN(eHex,16);
-        
+
         // TODO: Check e out of range
 
         let bigS = new BN(bigE);
@@ -137,7 +137,7 @@ class DlcOracle {
         bigS = bigS.mul(bigPriv);
         bigS = bigK.sub(bigS);
         bigS = DlcOracle.euclideanMod(bigS,ec.curve.n);
-        
+
         // TODO: Check zero
 
         let numberString = bigS.toString(16)
